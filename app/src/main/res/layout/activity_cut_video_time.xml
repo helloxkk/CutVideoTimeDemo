@@ -1,0 +1,103 @@
+<android.support.constraint.ConstraintLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent" android:layout_height="match_parent"
+	android:background="@color/black_overlay"
+	tools:context="cc.hellokk.cutvideotime.activity.CutVideoTimeActivity">
+
+	<TextureView
+		android:id="@+id/texture_view"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"/>
+
+	<ImageButton
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:background="?android:selectableItemBackgroundBorderless"
+		android:contentDescription="@string/come_back"
+		android:padding="@dimen/btn_padding"
+		android:layout_margin="@dimen/fab_margin"
+		app:layout_constraintTop_toTopOf="parent"
+		app:layout_constraintLeft_toLeftOf="parent"
+		android:src="@drawable/ic_arrow_back"/>
+
+	<ImageButton
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:background="?android:selectableItemBackgroundBorderless"
+		android:contentDescription="@string/come_back"
+		android:padding="@dimen/btn_padding"
+		app:layout_constraintTop_toTopOf="parent"
+		android:layout_margin="@dimen/fab_margin"
+		android:src="@drawable/ic_done"
+		app:layout_constraintRight_toRightOf="parent"/>
+
+	<TextView
+		android:id="@+id/tv_duration"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_alignParentBottom="true"
+		android:layout_centerHorizontal="true"
+		android:layout_marginBottom="14sp"
+		android:text="@string/clipped_time"
+		android:textColor="@android:color/white"
+		app:layout_constraintBottom_toBottomOf="parent"
+		app:layout_constraintLeft_toLeftOf="parent"
+		app:layout_constraintRight_toRightOf="parent"/>
+
+	<FrameLayout
+		android:layout_width="match_parent"
+		android:layout_height="65dp"
+		android:layout_alignParentBottom="true"
+		android:layout_marginBottom="15dp"
+		app:layout_constraintBottom_toTopOf="@+id/tv_duration">
+
+		<FrameLayout
+			android:id="@+id/layout_bottom"
+			android:layout_width="match_parent"
+			android:layout_height="60dp"
+			android:layout_gravity="center_vertical">
+
+			<android.support.v7.widget.RecyclerView
+				android:id="@+id/id_rv_id"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:layout_marginBottom="3dp"
+				android:layout_marginTop="3dp"
+				android:paddingStart="5dp"
+				android:paddingEnd="5dp"/>
+
+			<LinearLayout
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:orientation="horizontal">
+
+				<View
+					android:layout_width="35dp"
+					android:layout_height="match_parent"/>
+
+				<LinearLayout
+					android:id="@+id/id_seekBarLayout"
+					android:layout_width="0dp"
+					android:layout_height="match_parent"
+					android:layout_weight="1"
+					android:orientation="vertical"/>
+
+				<View
+					android:layout_width="35dp"
+					android:layout_height="match_parent"/>
+
+			</LinearLayout>
+
+		</FrameLayout>
+
+		<ImageView
+			android:id="@+id/positionIcon"
+			android:layout_width="wrap_content"
+			android:layout_height="match_parent"
+			android:layout_marginLeft="40dp"
+			android:src="@drawable/video_frame_line"/>
+
+	</FrameLayout>
+</android.support.constraint.ConstraintLayout>

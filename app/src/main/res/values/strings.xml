@@ -1,0 +1,10 @@
+<resources>
+	<string name="app_name">CutVideoTime</string>
+	<string name="action_settings">Settings</string>
+
+	<string name="title_activity_cut_video_time">CutVideoTimeActivity</string>
+	<string name="dummy_button">Dummy Button</string>
+	<string name="dummy_content">DUMMY\nCONTENT</string>
+	<string name="come_back">return</string>
+	<string name="clipped_time">你已裁剪%s秒</string>
+</resources>
