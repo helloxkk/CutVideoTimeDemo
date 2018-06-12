@@ -138,14 +138,19 @@ class CutVideoTimeView(context: Context?, absoluteMinValuePrim: Long, absoluteMa
 
             }
             MotionEvent.ACTION_MOVE -> {
+
             }
             MotionEvent.ACTION_UP -> {
+
             }
             MotionEvent.ACTION_POINTER_DOWN -> {
+
             }
             MotionEvent.ACTION_POINTER_UP -> {
+
             }
             MotionEvent.ACTION_CANCEL -> {
+
             }
             else ->{}
         }
