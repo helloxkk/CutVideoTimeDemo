@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.*
 import android.os.Bundle
 import android.os.Parcelable
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewConfiguration
 import cc.hellokk.cutvideotime.R
@@ -99,12 +100,56 @@ class CutVideoTimeView(context: Context?, absoluteMinValuePrim: Long, absoluteMa
         canvas?.drawRect(rangeL + dip2px(5f), 0f, rangeR - dip2px(5f), dip2px(4f), ractPaint)
         canvas?.drawRect(rangeL + dip2px(5f), height - dip2px(4f), rangeR - dip2px(5f), height.toFloat(), ractPaint)
         // 画左右拖动的thumb
-        canvas?.drawBitmap(mDragImageLeft,0f,0f,paint)
-        canvas?.drawBitmap(mDragImageRight,thumbWidth,0f,paint)
+        canvas?.drawBitmap(mDragImageLeft, 0f, 0f, paint)
+        canvas?.drawBitmap(mDragImageRight, thumbWidth, 0f, paint)
     }
 
     private fun normalizedToScreen(normalizedCoord: Double): Float {
         return (paddingLeft + normalizedCoord * (width - paddingLeft - paddingRight)).toFloat()
+    }
+
+    private var isTouchDown: Boolean = false
+
+    private var mActivePointerId: Int = 0
+
+    private var mDownMotionX: Float = 0f
+
+    override fun performClick(): Boolean {
+        return super.performClick()
+    }
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        if (isTouchDown)
+            return super.onTouchEvent(event)
+        if (event?.pointerCount!! > 1)
+            return super.onTouchEvent(event)
+        if (!isEnabled)
+            return false
+        if (absoluteMaxValuePrim <= min_cut_time)
+            return super.onTouchEvent(event)
+        val pointerIndex: Int// 记录点击点的index
+        val action = event.action
+        when (action and MotionEvent.ACTION_MASK) {
+            MotionEvent.ACTION_DOWN -> {
+                // 记住最后一个手指点击屏幕的坐标x
+                mActivePointerId = event.getPointerId(event.pointerCount - 1)
+                pointerIndex = event.findPointerIndex(mActivePointerId)
+                mDownMotionX = event.getX(pointerIndex)
+                // 判断 touch 到的是最大值 thumb 还是最小值 thumb
+
+            }
+            MotionEvent.ACTION_MOVE -> {
+            }
+            MotionEvent.ACTION_UP -> {
+            }
+            MotionEvent.ACTION_POINTER_DOWN -> {
+            }
+            MotionEvent.ACTION_POINTER_UP -> {
+            }
+            MotionEvent.ACTION_CANCEL -> {
+            }
+            else ->{}
+        }
+        return true
     }
 
     /**
