@@ -35,7 +35,6 @@ class CutVideoTimeView(context: Context?, absoluteMinValuePrim: Long, absoluteMa
     enum class Thumb {
         MIN, MAX
     }
-
     private var mScaledTouchSlop: Int? = null
 
     private var mDragImageLeft: Bitmap? = null
