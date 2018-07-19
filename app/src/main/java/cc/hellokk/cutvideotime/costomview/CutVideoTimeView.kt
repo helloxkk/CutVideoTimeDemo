@@ -31,6 +31,8 @@ class CutVideoTimeView(context: Context?, absoluteMinValuePrim: Long, absoluteMa
     private var isMin: Boolean = false
     private var min_width = 1.0//最小裁剪距离
     private var notifyWhileDragging = false
+    private val ACTION_POINTER_INDEX_MASK = 0x0000ff00
+    private val ACTION_POINTER_INDEX_SHIFT = 8
 
     init {
         this.absoluteMinValuePrim = absoluteMinValuePrim.toDouble()
@@ -179,21 +181,56 @@ class CutVideoTimeView(context: Context?, absoluteMinValuePrim: Long, absoluteMa
                 }
             }
             MotionEvent.ACTION_UP -> {
+                if (mIsDragging) {
+                    trackTouchEvent(event)
+                    onStopTrackingTouch()
+                    isPressed = false
+                } else {
+                    onStartTrackingTouch()
+                    trackTouchEvent(event)
+                    onStopTrackingTouch()
+                }
 
+                invalidate()
+                if (listener != null) {
+                    listener?.onRangeSeekBarValuesChanged(this, getSelectedMinValue(), getSelectedMaxValue(), MotionEvent.ACTION_UP, isMin, pressedThumb!!)
+                }
+                pressedThumb = null// 手指抬起，则置被touch到的thumb为空
             }
             MotionEvent.ACTION_POINTER_DOWN -> {
-
+                val index = event.pointerCount - 1
+                // final int index = ev.getActionIndex();
+                mDownMotionX = event.getX(index)
+                mActivePointerId = event.getPointerId(index)
+                invalidate()
             }
             MotionEvent.ACTION_POINTER_UP -> {
-
+                onSecondaryPointerUp(event)
+                invalidate()
             }
             MotionEvent.ACTION_CANCEL -> {
-
+                if (mIsDragging) {
+                    onStopTrackingTouch()
+                    isPressed = false
+                }
+                invalidate() // see above explanation
             }
             else ->{}
         }
         return true
     }
+
+    private fun onSecondaryPointerUp(ev: MotionEvent) {
+        val pointerIndex = ev.action and ACTION_POINTER_INDEX_MASK shr ACTION_POINTER_INDEX_SHIFT
+
+        val pointerId = ev.getPointerId(pointerIndex)
+        if (pointerId == mActivePointerId) {
+            val newPointerIndex = if (pointerIndex == 0) 1 else 0
+            mDownMotionX = ev.getX(newPointerIndex)
+            mActivePointerId = ev.getPointerId(newPointerIndex)
+        }
+    }
+
 
     /**
      * 请求父view不要拦截子控件的drag
@@ -335,6 +372,10 @@ class CutVideoTimeView(context: Context?, absoluteMinValuePrim: Long, absoluteMa
         mIsDragging = true
     }
 
+    private fun onStopTrackingTouch() {
+        mIsDragging = false
+    }
+
     /**
      * 计算位于哪个Thumb内
      *
@@ -369,6 +410,9 @@ class CutVideoTimeView(context: Context?, absoluteMinValuePrim: Long, absoluteMa
         return Math.abs(touchX - normalizedToScreen(normalizedThumbValue) - thumbWidth) <= thumbHalfWidth * scale
     }
 
+    fun setNotifyWhileDragging(flag: Boolean) {
+        this.notifyWhileDragging = flag
+    }
 
     /**
      * 根据手机的分辨率从 dip 的单位 转成为 px(像素)
