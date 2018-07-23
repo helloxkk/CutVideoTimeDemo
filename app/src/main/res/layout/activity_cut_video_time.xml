@@ -2,15 +2,29 @@
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto"
 	xmlns:tools="http://schemas.android.com/tools"
-	android:layout_width="match_parent" android:layout_height="match_parent"
+	android:id="@+id/root_layout" android:layout_width="match_parent"
+	android:layout_height="match_parent"
 	android:background="@color/black_overlay"
 	tools:context="cc.hellokk.cutvideotime.activity.CutVideoTimeActivity">
-
-	<TextureView
-		android:id="@+id/texture_view"
-		android:layout_width="match_parent"
-		android:layout_height="match_parent"/>
-
+	<FrameLayout
+		android:id="@+id/rl_video_container"
+		android:layout_width="0dp"
+		android:layout_height="0dp"
+		app:layout_constraintBottom_toBottomOf="parent"
+		app:layout_constraintLeft_toLeftOf="parent"
+		app:layout_constraintRight_toRightOf="parent"
+		app:layout_constraintTop_toTopOf="parent">
+		<RelativeLayout
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:layout_gravity="center">
+			<TextureView
+				android:id="@+id/texture_view"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:layout_centerInParent="true"/>
+		</RelativeLayout>
+	</FrameLayout>
 	<ImageButton
 		android:id="@+id/ib_back"
 		android:layout_width="wrap_content"

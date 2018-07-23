@@ -1,5 +1,6 @@
 package cc.hellokk.cutvideotime.costomview
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.*
 import android.os.Bundle
@@ -11,6 +12,7 @@ import android.view.ViewConfiguration
 import cc.hellokk.cutvideotime.R
 import java.text.DecimalFormat
 
+@SuppressLint("ViewConstructor")
 /**
  * 作者: Kun on 2018/6/6 11:35
  * 邮箱: vip@hellokk.cc
@@ -109,9 +111,10 @@ class CutVideoTimeView(context: Context?, absoluteMinValuePrim: Long, absoluteMa
         // 画出上下矩形
         canvas?.drawRect(rangeL + dip2px(5f), 0f, rangeR - dip2px(5f), dip2px(4f), ractPaint)
         canvas?.drawRect(rangeL + dip2px(5f), height - dip2px(4f), rangeR - dip2px(5f), height.toFloat(), ractPaint)
-        // 画左右拖动的thumb
-        canvas?.drawBitmap(mDragImageLeft, 0f, 0f, paint)
-        canvas?.drawBitmap(mDragImageRight, thumbWidth.toFloat(), 0f, paint)
+        // 画左侧拖动的thumb
+        canvas?.drawBitmap(mDragImageLeft, rangeL, 0f, paint)
+        // 画右侧拖动的thumb
+        canvas?.drawBitmap(mDragImageRight, rangeR - thumbWidth, 0f, paint)
     }
 
     private fun normalizedToScreen(normalizedCoord: Double): Float {

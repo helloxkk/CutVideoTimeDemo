@@ -2,8 +2,10 @@ package cc.hellokk.cutvideotime.activity
 
 import android.animation.ValueAnimator
 import android.content.Context
+import android.content.pm.ActivityInfo
 import android.graphics.SurfaceTexture
 import android.media.MediaPlayer
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
@@ -16,6 +18,7 @@ import android.util.Log
 import android.view.*
 import android.view.animation.LinearInterpolator
 import android.widget.FrameLayout
+import android.widget.RelativeLayout
 import android.widget.Toast
 import cc.hellokk.cutvideotime.R
 import cc.hellokk.cutvideotime.adapter.VideoEditAdapter
@@ -32,6 +35,7 @@ import org.jetbrains.anko.startActivity
 import java.io.File
 import java.lang.ref.WeakReference
 
+
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
@@ -40,7 +44,7 @@ class CutVideoTimeActivity : AppCompatActivity() {
     private var mMediaPlayer: MediaPlayer? = null
     private var MIN_CUT_DURATION = 3 * 1000L// 最小剪辑时间3s
     private var MAX_CUT_DURATION = 15 * 1000L//视频最多剪切多长时间
-    private var MAX_COUNT_RANGE = 10//seekBar的区域内一共有多少张图片
+    private var MAX_COUNT_RANGE = 10//显示缩略图的区域内一共有多少张图片
     private var mExtractVideoInfoUtil: ExtractVideoInfoUtil? = null
     private var mMaxWidth: Int = 0
     private var duration: Long = 0
@@ -76,6 +80,14 @@ class CutVideoTimeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_cut_video_time)
         window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
+            val decorView = window.decorView
+            val uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or View.SYSTEM_UI_FLAG_FULLSCREEN
+            decorView.systemUiVisibility = uiOptions
+        } else {
+            window.decorView.systemUiVisibility = View.GONE
+        }
         sLocalVideoPath = intent.getStringExtra(LOCAL_VIDEO_PATH)
         Log.e(TAG, " 本地视频路径 $sLocalVideoPath")
         initData()
@@ -190,7 +202,7 @@ class CutVideoTimeActivity : AppCompatActivity() {
         override fun onRangeSeekBarValuesChanged(bar: CutVideoTimeView, minValue: Long, maxValue: Long, action: Int, isMin: Boolean, pressedThumb: CutVideoTimeView.Thumb) {
             leftProgress = minValue + scrollPos
             rightProgress = maxValue + scrollPos
-            tv_duration.text = getString(R.string.clipped_time, ((rightProgress - leftProgress) / 1000).toString())
+            setDuration(((rightProgress - leftProgress) / 1000).toString())
             Log.e(TAG, "minValue: $minValue   maxValue: $maxValue")
             Log.e(TAG, "leftProgress: " + leftProgress / 1000 + "   rightProgress: " + rightProgress / 1000)
             when (action) {
@@ -218,20 +230,28 @@ class CutVideoTimeActivity : AppCompatActivity() {
         }
     }
 
+    private fun setDuration(duration: String) {
+        tv_duration.text = getString(R.string.clipped_time, duration)
+    }
+
     private fun videoStart() {
-        mMediaPlayer?.start()
-        positionIcon.clearAnimation()
-        animator?.apply { if (isRunning) cancel() }
-        anim()
-        handler.removeCallbacks(run)
-        handler.post(run)
+        mMediaPlayer?.let {
+            if (!it.isPlaying) {
+                it.start()
+                positionIcon.clearAnimation()
+                animator?.apply { if (isRunning) cancel() }
+                anim()
+                handler.removeCallbacks(run)
+                handler.post(run)
+            }
+        }
     }
 
 
     private fun initData() {
         //for video check
         if (!File(sLocalVideoPath).exists()) {
-            Toast.makeText(this, "视频文件不存在", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.video_file_does_not_exist), Toast.LENGTH_LONG).show()
             finish()
         }
         mExtractVideoInfoUtil = ExtractVideoInfoUtil(sLocalVideoPath)
@@ -240,6 +260,7 @@ class CutVideoTimeActivity : AppCompatActivity() {
         mMaxWidth = getScreenWidth(this) - dip2px(this, 70f)
         mScaledTouchSlop = ViewConfiguration.get(this).scaledTouchSlop
         Log.e(TAG, "mMaxWidth: " + mMaxWidth)
+        setDuration("15")
     }
 
     private fun initRecyclerView() {
@@ -288,15 +309,6 @@ class CutVideoTimeActivity : AppCompatActivity() {
                 leftProgress = mCutVideoTimeView?.getSelectedMinValue()!! + scrollPos
                 rightProgress = mCutVideoTimeView?.getSelectedMaxValue()!! + scrollPos
 
-                Log.e(TAG, "seekBar.getSelectedMaxValue(): " + mCutVideoTimeView?.getSelectedMaxValue() + "  + scrollPos: " + scrollPos)
-                //                L.e("scrollX: " + scrollX + "  scrollPos: " + scrollPos + "  averageMsPx: " + averageMsPx + "  35 : " + (dip2px(self, 35)) + "  rightProgress: " + rightProgress);
-                // averageMsPx: 13.026522
-                // dip2px(self, 35) : 123
-                // scrollX: 1201
-                // selectedMaxValue() = 15000
-                // scrollPos: 17247
-                // rightProgress: 32247
-
                 mMediaPlayer?.seekTo(leftProgress.toInt())
             }
             lastScrollX = scrollX
@@ -319,7 +331,7 @@ class CutVideoTimeActivity : AppCompatActivity() {
     private var animator: ValueAnimator? = null
 
     private fun anim() {
-        if (positionIcon.visibility === View.GONE) {
+        if (positionIcon.visibility == View.GONE) {
             positionIcon.visibility = View.VISIBLE
         }
         val params = positionIcon.layoutParams as FrameLayout.LayoutParams
@@ -344,12 +356,12 @@ class CutVideoTimeActivity : AppCompatActivity() {
                 handler.removeCallbacks(run)
             }
         }
-        if (positionIcon.visibility === View.VISIBLE) {
+        if (positionIcon.visibility == View.VISIBLE) {
             positionIcon.visibility = View.GONE
         }
         positionIcon.clearAnimation()
-        if (animator != null && animator!!.isRunning) {
-            animator!!.cancel()
+        if (animator != null && animator?.isRunning!!) {
+            animator?.cancel()
         }
     }
 
@@ -402,8 +414,8 @@ class CutVideoTimeActivity : AppCompatActivity() {
                 isLooping = true
                 //设置videoview的OnPrepared监听
                 setOnPreparedListener({ mp ->
-                    videoStart()
                     initVideoSize(videoWidth, videoHeight)
+                    Handler().postDelayed({ videoStart() }, 500)
                     //设置MediaPlayer的OnSeekComplete监听
                     mp.setOnSeekCompleteListener {
                         if (!isSeeking) {
@@ -425,15 +437,19 @@ class CutVideoTimeActivity : AppCompatActivity() {
      * @param videoHeight
      */
     private fun initVideoSize(videoWidth: Int, videoHeight: Int) {
-        val ra = videoWidth * 1f / videoHeight
-        val widthF = videoWidth * 1f / VIDEO_HEIGHT
-        val heightF = videoHeight * 1f / VIDEO_WIDTH
-        val layoutParams = texture_view.layoutParams
-        layoutParams.width = (getScreenWidth(this) * widthF).toInt()
-        layoutParams.height = (layoutParams.width / ra).toInt()
-        texture_view.layoutParams = layoutParams
-    }
+        //根据视频尺寸去计算->视频可以在sufaceView中放大的最大倍数。
+        val max: Float = if (resources.configuration.orientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
+            //竖屏模式下按视频宽度计算放大倍数值
+            Math.max(videoWidth.toFloat() / texture_view.width, videoHeight.toFloat() / texture_view.height)
+        } else {
+            //横屏模式下按视频高度计算放大倍数值
+            Math.max(videoWidth.toFloat() / texture_view.height, videoHeight.toFloat() / texture_view.width)
+        }
 
+        //视频宽高分别/最大倍数值 计算出放大后的视频尺寸
+        //无法直接设置视频尺寸，将计算出的视频尺寸设置到surfaceView 让视频自动填充。
+        texture_view.layoutParams = RelativeLayout.LayoutParams(Math.ceil((videoWidth.toFloat() / max).toDouble()).toInt(), Math.ceil((videoHeight.toFloat() / max).toDouble()).toInt())
+    }
 
     override fun onResume() {
         super.onResume()
