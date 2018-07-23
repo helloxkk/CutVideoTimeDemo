@@ -28,6 +28,8 @@
 			android:label="@string/title_activity_cut_video_time"
 			android:theme="@style/Theme.AppCompat.Light.NoActionBar">
 		</activity>
+		<activity android:name=".activity.PublishVideoActivity">
+		</activity>
 	</application>
 
 </manifest>

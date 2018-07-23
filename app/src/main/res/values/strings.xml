@@ -7,4 +7,9 @@
 	<string name="dummy_content">DUMMY\nCONTENT</string>
 	<string name="come_back">return</string>
 	<string name="clipped_time">你已裁剪%s秒</string>
+	<string name="dialog_hint">提示</string>
+	<string name="dialog_confirm">确定</string>
+	<string name="dialog_cancel">取消</string>
+	<string name="video_can_not_be_longer_than_15_seconds">视频时长不能多于15秒</string>
+	<string name="whether_to_exit_editing">是否退出编辑？</string>
 </resources>

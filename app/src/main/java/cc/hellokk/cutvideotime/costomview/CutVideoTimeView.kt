@@ -414,6 +414,33 @@ class CutVideoTimeView(context: Context?, absoluteMinValuePrim: Long, absoluteMa
         this.notifyWhileDragging = flag
     }
 
+    fun setSelectedMinValue(value: Long) {
+        if (0.0 == absoluteMaxValuePrim - absoluteMinValuePrim) {
+            setNormalizedMinValue(0.0)
+        } else {
+            setNormalizedMinValue(valueToNormalized(value))
+        }
+    }
+
+    fun setSelectedMaxValue(value: Long) {
+        if (0.0 == absoluteMaxValuePrim - absoluteMinValuePrim) {
+            setNormalizedMaxValue(1.0)
+        } else {
+            setNormalizedMaxValue(valueToNormalized(value))
+        }
+    }
+
+    private fun valueToNormalized(value: Long): Double {
+        if (0.0 == absoluteMaxValuePrim - absoluteMinValuePrim) {
+            return 0.0
+        }
+        return (value - absoluteMinValuePrim) / (absoluteMaxValuePrim - absoluteMinValuePrim)
+    }
+
+    fun setMinCutTime(min_cut_time: Long) {
+        this.min_cut_time = min_cut_time
+    }
+
     /**
      * 根据手机的分辨率从 dip 的单位 转成为 px(像素)
      */

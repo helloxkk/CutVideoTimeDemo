@@ -14,4 +14,14 @@ object Constant {
         var VIDEO_PATH = BASE_PATH + "/video/"
         var VIDEO_IMAGE_PATH = VIDEO_PATH + "/image/"
     }
+
+    object Key {
+        val KEY_LOCAL_VIDEO_PATH = "LocalVideoPath"
+        val KEY_SAVE_VIDEO_PATH = "SaveVideoPath"
+        val KEY_IS_COMPOSITE_VIDEO = "IsCompositeVideo"
+        val KEY_PROGRESS = "progress"
+        val KEY_IS_CUT_VIDEO = "isCutVideo"
+        val KEY_START_M = "startM"
+        val KEY_END_M = "endM"
+    }
 }
