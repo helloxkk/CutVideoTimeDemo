@@ -97,9 +97,11 @@ class CutVideoTimeActivity : AppCompatActivity() {
     }
 
     private fun initListeners() {
+
         ib_back.setOnClickListener {
             showBackDialog(getString(R.string.whether_to_exit_editing))
         }
+
         ib_finish.setOnClickListener {
             if (rightProgress - leftProgress > 15000) {
                 Log.e(TAG, getString(R.string.video_can_not_be_longer_than_15_seconds))
@@ -431,7 +433,7 @@ class CutVideoTimeActivity : AppCompatActivity() {
     }
 
     /**
-     * 初始化视频播放器
+     * 初始化视频大小
      *
      * @param videoWidth
      * @param videoHeight
