@@ -4,3 +4,5 @@
 ## Preview
 
 ![Preview](https://img-blog.csdn.net/20180606210655186?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L1hrNjMyMTcyNzQ4/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
+
+现在还没导入 ffmpeg 库, 未做视频剪切，待后续完善。
