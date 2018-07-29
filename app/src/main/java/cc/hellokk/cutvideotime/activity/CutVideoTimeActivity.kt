@@ -41,6 +41,7 @@ import java.lang.ref.WeakReference
  * status bar and navigation/system bar) with user interaction.
  */
 class CutVideoTimeActivity : AppCompatActivity() {
+
     private var mMediaPlayer: MediaPlayer? = null
     private var MIN_CUT_DURATION = 3 * 1000L// 最小剪辑时间3s
     private var MAX_CUT_DURATION = 15 * 1000L//视频最多剪切多长时间
