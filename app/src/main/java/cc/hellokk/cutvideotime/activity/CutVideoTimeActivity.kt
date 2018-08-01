@@ -124,7 +124,6 @@ class CutVideoTimeActivity : AppCompatActivity() {
             }
 
             override fun onSurfaceTextureUpdated(surface: SurfaceTexture) {
-
             }
         }
     }
