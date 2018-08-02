@@ -248,7 +248,6 @@ class CutVideoTimeActivity : AppCompatActivity() {
         }
     }
 
-
     private fun initData() {
         //for video check
         if (!File(sLocalVideoPath).exists()) {
