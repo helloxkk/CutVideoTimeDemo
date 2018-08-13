@@ -272,6 +272,7 @@ class CutVideoTimeActivity : AppCompatActivity() {
     }
 
     private var isOverScaledTouchSlop: Boolean = false
+
     private val mOnScrollListener = object : RecyclerView.OnScrollListener() {
         override fun onScrollStateChanged(recyclerView: RecyclerView?, newState: Int) {
             super.onScrollStateChanged(recyclerView, newState)
