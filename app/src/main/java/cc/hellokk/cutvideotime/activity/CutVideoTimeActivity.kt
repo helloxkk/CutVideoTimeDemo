@@ -97,7 +97,6 @@ class CutVideoTimeActivity : AppCompatActivity() {
     }
 
     private fun initListeners() {
-
         ib_back.setOnClickListener {
             showBackDialog(getString(R.string.whether_to_exit_editing))
         }
