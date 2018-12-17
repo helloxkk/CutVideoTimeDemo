@@ -249,7 +249,6 @@ class CutVideoTimeActivity : AppCompatActivity() {
     }
 
     private fun initData() {
-
         if (!File(sLocalVideoPath).exists()) {
             Toast.makeText(this, getString(R.string.video_file_does_not_exist), Toast.LENGTH_LONG).show()
             finish()
