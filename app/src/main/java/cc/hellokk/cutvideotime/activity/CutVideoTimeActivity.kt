@@ -52,7 +52,7 @@ class CutVideoTimeActivity : AppCompatActivity() {
     private var videoEditAdapter: VideoEditAdapter? = null
     private var averageMsPx: Float = 0.toFloat()//每毫秒所占的px
     private var averagePxMs: Float = 0.toFloat()//每px所占用的ms毫秒
-    private var OutPutFileDirPath: String? = null
+    private var mOutPutFileDirPath: String? = null
     private var mExtractFrameWorkThread: ExtractFrameWorkThread? = null
     private var leftProgress: Long = 0
     private var rightProgress: Long = 0
@@ -79,6 +79,14 @@ class CutVideoTimeActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_cut_video_time)
+        initWindow()
+        initRecyclerView()
+        initData()
+        initEditVideo()
+        initListeners()
+    }
+
+    private fun initWindow() {
         window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
@@ -88,16 +96,9 @@ class CutVideoTimeActivity : AppCompatActivity() {
         } else {
             window.decorView.systemUiVisibility = View.GONE
         }
-        sLocalVideoPath = intent.getStringExtra(LOCAL_VIDEO_PATH)
-        Log.e(TAG, " 本地视频路径 $sLocalVideoPath")
-        initData()
-        initRecyclerView()
-        initEditVideo()
-        initListeners()
     }
 
     private fun initListeners() {
-
         ib_back.setOnClickListener {
             showBackDialog(getString(R.string.whether_to_exit_editing))
         }
@@ -146,7 +147,7 @@ class CutVideoTimeActivity : AppCompatActivity() {
         }
         id_rv_id.addItemDecoration(EditSpacingItemDecoration(dip2px(this, 35f), thumbnailsCount))
 
-        //init seekBar
+        //CutVideoTimeView init
         if (isOver_15_s) {
             mCutVideoTimeView = CutVideoTimeView(this, 0L, MAX_CUT_DURATION)
             mCutVideoTimeView?.setSelectedMinValue(0L)
@@ -156,18 +157,16 @@ class CutVideoTimeActivity : AppCompatActivity() {
             mCutVideoTimeView?.setSelectedMinValue(0L)
             mCutVideoTimeView?.setSelectedMaxValue(endPosition)
         }
+
         mCutVideoTimeView?.setMinCutTime(MIN_CUT_DURATION)//设置最小裁剪时间
         mCutVideoTimeView?.setNotifyWhileDragging(true)
         mCutVideoTimeView?.setOnRangeSeekBarChangeListener(mOnRangeSeekBarChangeListener)
         id_seekBarLayout.addView(mCutVideoTimeView)
-
         averageMsPx = duration * 1.0f / rangeWidth * 1.0f
-        Log.e(TAG, "duration: " + (duration * 1.0f).toString())
-        Log.e(TAG, "rangeWidth: " + (rangeWidth * 1.0f).toString())
-        OutPutFileDirPath = getSaveEditThumbnailDir(this)
+        mOutPutFileDirPath = getSaveEditThumbnailDir(this)
         val extractW = (getScreenWidth(this) - dip2px(this, 70f)) / MAX_COUNT_RANGE
         val extractH = dip2px(this, 55f)
-        mExtractFrameWorkThread = ExtractFrameWorkThread(extractW, extractH, mUIHandler, sLocalVideoPath, OutPutFileDirPath, startPosition, endPosition, thumbnailsCount)
+        mExtractFrameWorkThread = ExtractFrameWorkThread(extractW, extractH, mUIHandler, sLocalVideoPath, mOutPutFileDirPath, startPosition, endPosition, thumbnailsCount)
         mExtractFrameWorkThread?.start()
 
         //init pos icon start
@@ -203,7 +202,7 @@ class CutVideoTimeActivity : AppCompatActivity() {
         override fun onRangeSeekBarValuesChanged(bar: CutVideoTimeView, minValue: Long, maxValue: Long, action: Int, isMin: Boolean, pressedThumb: CutVideoTimeView.Thumb) {
             leftProgress = minValue + scrollPos
             rightProgress = maxValue + scrollPos
-            setDuration(((rightProgress - leftProgress) / 1000).toString())
+            setDuration((rightProgress - leftProgress) / 1000)
             Log.e(TAG, "minValue: $minValue   maxValue: $maxValue")
             Log.e(TAG, "leftProgress: " + leftProgress / 1000 + "   rightProgress: " + rightProgress / 1000)
             when (action) {
@@ -231,8 +230,8 @@ class CutVideoTimeActivity : AppCompatActivity() {
         }
     }
 
-    private fun setDuration(duration: String) {
-        tv_duration.text = getString(R.string.clipped_time, duration)
+    private fun setDuration(duration: Long) {
+        tv_duration.text = getString(R.string.clipped_time, duration.toString())
     }
 
     private fun videoStart() {
@@ -249,17 +248,20 @@ class CutVideoTimeActivity : AppCompatActivity() {
     }
 
     private fun initData() {
+        // 本地视频路径
+        sLocalVideoPath = intent.getStringExtra(LOCAL_VIDEO_PATH)
+
         if (!File(sLocalVideoPath).exists()) {
             Toast.makeText(this, getString(R.string.video_file_does_not_exist), Toast.LENGTH_LONG).show()
             finish()
         }
+
         mExtractVideoInfoUtil = ExtractVideoInfoUtil(sLocalVideoPath)
         duration = mExtractVideoInfoUtil?.videoLength?.toLong()!!
 
         mMaxWidth = getScreenWidth(this) - dip2px(this, 70f)
         mScaledTouchSlop = ViewConfiguration.get(this).scaledTouchSlop
-        Log.e(TAG, "mMaxWidth: " + mMaxWidth)
-        setDuration("15")
+        setDuration(15)
     }
 
     private fun initRecyclerView() {
@@ -335,11 +337,11 @@ class CutVideoTimeActivity : AppCompatActivity() {
             positionIcon.visibility = View.VISIBLE
         }
         val params = positionIcon.layoutParams as FrameLayout.LayoutParams
-        val start = (dip2px(this, 35f) + (leftProgress/*mVideoView.getCurrentPosition()*/ - scrollPos) * averagePxMs).toInt()
+        val start = (dip2px(this, 35f) + (leftProgress - scrollPos) * averagePxMs).toInt()
         val end = (dip2px(this, 35f) + (rightProgress - scrollPos) * averagePxMs).toInt()
         animator = ValueAnimator
                 .ofInt(start, end)
-                .setDuration(rightProgress - scrollPos - (leftProgress/*mVideoView.getCurrentPosition()*/ - scrollPos))
+                .setDuration(rightProgress - scrollPos - (leftProgress - scrollPos))
         animator?.interpolator = LinearInterpolator()
         animator?.addUpdateListener { animation ->
             params.leftMargin = animation.animatedValue as Int
@@ -395,8 +397,8 @@ class CutVideoTimeActivity : AppCompatActivity() {
         mExtractFrameWorkThread?.apply { stopExtract() }
         mUIHandler.removeCallbacksAndMessages(null)
         handler.removeCallbacksAndMessages(null)
-        if (!TextUtils.isEmpty(OutPutFileDirPath)) {
-            deleteFile(File(OutPutFileDirPath))
+        if (!TextUtils.isEmpty(mOutPutFileDirPath)) {
+            deleteFile(File(mOutPutFileDirPath))
         }
     }
 
