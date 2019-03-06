@@ -391,7 +391,6 @@ class CutVideoTimeActivity : AppCompatActivity() {
         super.onDestroy()
         mMediaPlayer?.apply { release() }
         animator?.apply { cancel() }
-
         mExtractVideoInfoUtil?.apply { release() }
         id_rv_id.removeOnScrollListener(mOnScrollListener)
         mExtractFrameWorkThread?.apply { stopExtract() }
