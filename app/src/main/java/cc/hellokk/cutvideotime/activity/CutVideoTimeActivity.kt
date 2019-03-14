@@ -506,11 +506,11 @@ class CutVideoTimeActivity : AppCompatActivity() {
         mDialog?.setTitle(getString(R.string.dialog_hint))
         mDialog?.setMessage(message)
 
-        mDialog?.setNegativeButton(getString(R.string.dialog_cancel), { dialog, _ -> dialog.dismiss() })
-        mDialog?.setPositiveButton(getString(R.string.dialog_confirm), { dialog, _ ->
+        mDialog?.setNegativeButton(getString(R.string.dialog_cancel)) { dialog, _ -> dialog.dismiss() }
+        mDialog?.setPositiveButton(getString(R.string.dialog_confirm)) { dialog, _ ->
             dialog.dismiss()
             finish()
-        })
+        }
         mDialog?.show()
     }
 }
